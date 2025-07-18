@@ -1,5 +1,6 @@
 service: teacher-assistant
-frameworkVersion: "3"
+frameworkVersion: "^3.0.0"
+
 provider:
   name: aws
   runtime: python3.12
@@ -7,11 +8,13 @@ provider:
   stage: ${opt:stage, 'dev'}
   memorySize: 1024
   timeout: 30
+
   environment:
     STAGE: ${self:provider.stage}
     REGION_AWS: ${self:provider.region}
     LOG_LEVEL: INFO
     FUNCTION_TIMEOUT: ${self:provider.timeout}
+
   iam:
     role:
       statements:
@@ -19,38 +22,29 @@ provider:
           Action:
             - bedrock:InvokeModel
             - bedrock:InvokeModelWithResponseStream
-          Resource: "arn:aws:bedrock:*:*:foundation-model/*"
+          Resource: "arn:aws:bedrock:us-east-1:528350874567:inference-profile/us.amazon.nova-micro-v1:0"
         - Effect: Allow
           Action:
             - logs:CreateLogGroup
             - logs:CreateLogStream
             - logs:PutLogEvents
           Resource: "arn:aws:logs:*:*:*"
+
 plugins:
+  - serverless-python-requirements
   - serverless-dotenv-plugin
-  # - serverless-python-requirements        // this is needed for local development
-  # - serverless-offline                   // this is needed for local development
+  - serverless-offline
+
 custom:
+  pythonRequirements:
+    dockerizePip: false
+    slim: true
+    strip: false
+    fileName: requirements.txt
+
   dotenv:
     path: .env
-package:
-  individually: true
-  include:
-    - handlers/**
-  exclude:
-    - "**/__pycache__/**"
-    - "**/*.pyc"
-    - "**/.DS_Store"
-    - "**/.venv/**"
-    - "**/venv/**"
-    - "**/node_modules/**"
-    - "**/.pytest_cache/**"
-    - "**/.git/**"
-    - "**/.idea/**"
-    - "**/tests/**"
-    - "**/*.log"
-    - "**/*.md"
-    - "**/README*"
+
 functions:
   teacher:
     handler: handlers.teacher_handler.lambda_handler
@@ -64,6 +58,7 @@ functions:
           cors: true
     environment:
       FUNCTION_NAME: teacher
+
   weather:
     handler: handlers.weather_handler.lambda_handler
     name: ${self:service}-${self:provider.stage}-weather
@@ -76,6 +71,7 @@ functions:
           cors: true
     environment:
       FUNCTION_NAME: weather
+
   math:
     handler: handlers.math_handler.lambda_handler
     name: ${self:service}-${self:provider.stage}-math
@@ -88,6 +84,7 @@ functions:
           cors: true
     environment:
       FUNCTION_NAME: math
+
 resources:
   Resources:
     ApiGatewayRestApi:
@@ -95,12 +92,14 @@ resources:
       Properties:
         Name: ${self:service}-${self:provider.stage}-api
         Description: Teacher Assistant API Gateway
+
   Outputs:
     ApiGatewayRestApiId:
       Value:
         Ref: ApiGatewayRestApi
       Export:
         Name: ${self:service}-${self:provider.stage}-api-id
+
     ApiGatewayRestApiRootResourceId:
       Value:
         Fn::GetAtt:
