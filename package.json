@@ -11,8 +11,7 @@
     "logs:weather": "serverless logs -f weather -t",
     "logs:math": "serverless logs -f math -t",
     "invoke:weather": "serverless invoke -f weather",
-    "invoke:math": "serverless invoke -f math",
-    "test": "python -m pytest tests/ -v"
+    "invoke:math": "serverless invoke -f math"
   },
   "devDependencies": {
     "serverless-dotenv-plugin": "^6.0.0",

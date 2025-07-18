@@ -86,18 +86,6 @@ functions:
     environment:
       FUNCTION_NAME: math
 
-  # Optional Health Check Endpoint
-  # health:
-  #   handler: handlers.health_handler.lambda_handler
-  #   name: ${self:service}-${self:provider.stage}-health
-  #   description: Health check endpoint
-  #   timeout: 5
-  #   events:
-  #     - http:
-  #         path: health
-  #         method: get
-  #         cors: true
-
 resources:
   Resources:
     ApiGatewayRestApi:
