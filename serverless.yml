@@ -28,8 +28,6 @@ provider:
           Resource: "arn:aws:logs:*:*:*"
 plugins:
   - serverless-dotenv-plugin
-  # - serverless-python-requirements        // this is needed for local development
-  # - serverless-offline                   // this is needed for local development
 custom:
   dotenv:
     path: .env
